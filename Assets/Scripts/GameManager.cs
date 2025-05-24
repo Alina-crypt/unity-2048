@@ -8,31 +8,42 @@ public class GameManager : MonoBehaviour
     public CanvasGroup gameOver;
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI hiscoreText;
-
+    AudioManager audioManager;
     private int score;
+    
 
     private void Start()
     {
         NewGame();
     }
+
     public void NewGame()
     {
+        AudioManager.Instance.PlayClick();
         SetScore(0);
-        hiscoreText.text =LoadHiscore().ToString();
+        hiscoreText.text = LoadHiscore().ToString();
         gameOver.alpha = 0f;
         gameOver.interactable = false;
         board.ClearBoard();
         board.CreateTile();
         board.CreateTile();
         board.enabled = true;
-    }
 
+    }
+    public HeartSystem heartSystem;
+
+    public void OnButtonClick()
+    {
+        heartSystem.LoseLife();
+    }
     public void GameOver()
     {
+        AudioManager.Instance.PlayGameOver();
         board.enabled = false;
-        gameOver.interactable=true;
+        gameOver.interactable = true;
         StartCoroutine(Fade(gameOver, 1f, 1f));
     }
+
     private IEnumerator Fade(CanvasGroup canvasGroup, float to, float delay)
     {
         yield return new WaitForSeconds(delay);
@@ -40,18 +51,18 @@ public class GameManager : MonoBehaviour
         float duration = 0.5f;
         float from = canvasGroup.alpha;
 
-        while (elapsed < duration) {
+        while (elapsed < duration)
+        {
             canvasGroup.alpha = Mathf.Lerp(from, to, elapsed / duration);
             elapsed += Time.deltaTime;
             yield return null;
         }
         canvasGroup.alpha = to;
-
     }
 
     public void IncreaseScore(int points)
     {
-        SetScore(score+points);
+        SetScore(score + points);
     }
 
     private void SetScore(int score)
@@ -60,6 +71,7 @@ public class GameManager : MonoBehaviour
         scoreText.text = score.ToString();
         SaveHiscore();
     }
+
     private void SaveHiscore()
     {
         int hisCore = LoadHiscore();
@@ -68,7 +80,8 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.SetInt("hiscore", score);
         }
     }
-    private int LoadHiscore() 
+
+    private int LoadHiscore()
     {
         return PlayerPrefs.GetInt("hiscore", 0);
     }

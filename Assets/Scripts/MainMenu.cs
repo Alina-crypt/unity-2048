@@ -3,9 +3,11 @@
 public class MainMenu : MonoBehaviour
 {
     public SceneTransition transition;
-
+    public AudioManager audioManager;
     public void playGame()
+
     {
+        
         Debug.Log("Play button clicked");
         transition.FadeToScene("2048game2");
     }
@@ -18,6 +20,7 @@ public class MainMenu : MonoBehaviour
 
     public void exitGame()
     {
+       
         Debug.Log("Exit button clicked");
         Application.Quit();
     }

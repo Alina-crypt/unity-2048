@@ -10,7 +10,7 @@ public class TileBoard : MonoBehaviour
     public TileState[] tileStates;
     private TileGrid grid;
     private List<Tile> tiles;
-
+    AudioManager audioManager;
     private bool waiting;
     private void Awake()
     {
@@ -112,6 +112,7 @@ public class TileBoard : MonoBehaviour
     }
     private bool MoveTile(Tile tile, Vector2Int direction)
     {
+        
         TileCell newCell = null;
         TileCell adjacent = grid.GetAdjacentCell(tile.cell, direction);
 
@@ -148,6 +149,7 @@ public class TileBoard : MonoBehaviour
 
     private void Merge(Tile a, Tile b)
     {
+        AudioManager.Instance.PlayMerge();
         tiles.Remove(a);
         a.MergeTo(b.cell);
 

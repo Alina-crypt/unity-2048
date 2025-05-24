@@ -7,6 +7,7 @@ public class PauseMenu : MonoBehaviour
 {
     public bool PauseGame;
     public GameObject pauseGameMenu;
+    public AudioManager audioManager;
 
     void Update()
     {
@@ -25,6 +26,7 @@ public class PauseMenu : MonoBehaviour
 
     public void Resume()
     {
+        AudioManager.Instance.PlayClick();
         pauseGameMenu.SetActive(false);
         Time.timeScale = 1f;
         PauseGame = false;
@@ -32,6 +34,7 @@ public class PauseMenu : MonoBehaviour
 
     public void Pause()
     {
+        AudioManager.Instance.PlayClick();
         pauseGameMenu.SetActive(true);
         Time.timeScale = 0f;
         PauseGame = true;
@@ -39,6 +42,7 @@ public class PauseMenu : MonoBehaviour
 
     public void LoadMenu()
     {
+        AudioManager.Instance.PlayClick();
         Time.timeScale = 1f;
         SceneManager.LoadScene("1MainMenu");
     }

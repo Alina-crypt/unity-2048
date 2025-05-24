@@ -149,24 +149,23 @@ public class Tile : MonoBehaviour
 
     private void SetColorByNumber(int number)
     {
-        text.color = new Color32(60, 60, 60, 255); // тёмно-серый
-
         switch (number)
         {
-            case 2: background.color = new Color32(223, 242, 218, 255); break;        // нежно-зелёный
-            case 4: background.color = new Color32(213, 232, 249, 255); break;        // светло-голубой
-            case 8: background.color = new Color32(245, 224, 245, 255); break;        // сиренево-розовый
-            case 16: background.color = new Color32(254, 235, 208, 255); break;       // бежево-оранжевый
-            case 32: background.color = new Color32(255, 220, 210, 255); break;       // пастельно-коралловый
-            case 64: background.color = new Color32(240, 222, 255, 255); break;       // светлая лаванда
-            case 128: background.color = new Color32(208, 245, 255, 255); break;      // мятно-голубой
-            case 256: background.color = new Color32(255, 250, 204, 255); break;      // нежно-жёлтый
-            case 512: background.color = new Color32(255, 225, 239, 255); break;      // розовый зефир
-            case 1024: background.color = new Color32(225, 255, 240, 255); break;     // мятный лёд
-            case 2048: background.color = new Color32(235, 245, 255, 255); break;     // небесно-серебристый
-            default: background.color = new Color32(220, 220, 220, 255); break;       // светлый серый (для пустых/неизвестных)
+            case 2: background.color = new Color32(255, 230, 204, 255); break; // Светлый персик
+            case 4: background.color = new Color32(255, 204, 204, 255); break; // Светло-розовый
+            case 8: background.color = new Color32(255, 179, 255, 255); break; // Светлая фуксия
+            case 16: background.color = new Color32(204, 204, 255, 255); break; // Светлый лавандовый
+            case 32: background.color = new Color32(153, 204, 255, 255); break; // Светлый голубой
+            case 64: background.color = new Color32(153, 255, 204, 255); break; // Светлый мятный
+            case 128: background.color = new Color32(204, 255, 153, 255); break; // Светло-зеленый
+            case 256: background.color = new Color32(255, 255, 153, 255); break; // Светло-желтый
+            case 512: background.color = new Color32(255, 204, 153, 255); break; // Светлый оранжевый
+            case 1024: background.color = new Color32(255, 153, 153, 255); break; // Светлый коралловый
+            case 2048: background.color = new Color32(255, 153, 204, 255); break; // Светло-розово-персиковый
+            default: background.color = new Color32(128, 128, 128, 255); break; // Серый для больших значений
         }
     }
+
 
 
 }
