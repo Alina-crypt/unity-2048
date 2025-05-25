@@ -149,6 +149,8 @@ public class Tile : MonoBehaviour
 
     private void SetColorByNumber(int number)
     {
+        text.color = new Color32(60, 60, 60, 255); // тёмно-серый
+
         switch (number)
         {
             case 2: background.color = new Color32(255, 230, 204, 255); break; // Светлый персик
@@ -165,7 +167,6 @@ public class Tile : MonoBehaviour
             default: background.color = new Color32(128, 128, 128, 255); break; // Серый для больших значений
         }
     }
-
 
 
 }

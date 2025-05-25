@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -25,7 +25,7 @@ public class TileBoard : MonoBehaviour
 
     private IEnumerator ScaleIn()
     {
-        float duration = 0.5f; // ����������������� ��������
+        float duration = 0.5f; // Продолжительность анимации
         float time = 0f;
         Vector3 targetScale = Vector3.one;
 
@@ -40,6 +40,57 @@ public class TileBoard : MonoBehaviour
         transform.localScale = targetScale;
     }
 
+    public string SerializeBoard()
+    {
+        List<string> tileData = new List<string>();
+
+        foreach (var tile in tiles)
+        {
+            int x = tile.cell.x;
+            int y = tile.cell.y;
+            int number = tile.number;
+            tileData.Add($"{x}:{y}:{number}");
+        }
+
+        return string.Join("|", tileData); // Пример: "0:0:2|1:0:4|2:0:2"
+    }
+    public void DeserializeBoard(string data)
+    {
+        ClearBoard();
+
+        if (string.IsNullOrEmpty(data))
+            return;
+
+        string[] entries = data.Split('|');
+        foreach (var entry in entries)
+        {
+            string[] parts = entry.Split(':');
+            if (parts.Length != 3)
+                continue;
+
+            int x = int.Parse(parts[0]);
+            int y = int.Parse(parts[1]);
+            int number = int.Parse(parts[2]);
+
+            TileCell cell = grid.GetCell(x, y);
+            if (cell != null)
+            {
+                Tile tile = Instantiate(tilePrefab, grid.transform);
+                tile.SetState(GetStateForNumber(number), number);
+                tile.Spawn(cell); // без анимации перемещения
+                tiles.Add(tile);
+            }
+        }
+    }
+    private TileState GetStateForNumber(int number)
+    {
+        foreach (var state in tileStates)
+        {
+            if (state.number == number)
+                return state;
+        }
+        return tileStates[0]; // fallback на 2
+    }
 
     public void ClearBoard()
     {
@@ -70,19 +121,19 @@ public class TileBoard : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
             {
-                MoveTiles(Vector2Int.up, 0, 1, 1, 1); // y �� 1 �� height
+                MoveTiles(Vector2Int.up, 0, 1, 1, 1); // y от 1 до height
             }
             else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
             {
-                MoveTiles(Vector2Int.down, 0, 1, grid.height - 2, -1); // y �� height - 2 �� 0
+                MoveTiles(Vector2Int.down, 0, 1, grid.height - 2, -1); // y от height - 2 до 0
             }
             else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
             {
-                MoveTiles(Vector2Int.left, 1, 1, 0, 1); // x �� 1 �� width
+                MoveTiles(Vector2Int.left, 1, 1, 0, 1); // x от 1 до width
             }
             else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
             {
-                MoveTiles(Vector2Int.right, grid.width - 2, -1, 0, 1); // x �� width - 2 �� 0
+                MoveTiles(Vector2Int.right, grid.width - 2, -1, 0, 1); // x от width - 2 до 0
             }
         }
         if (waiting || riddleActive) return;
@@ -109,6 +160,14 @@ public class TileBoard : MonoBehaviour
             StartCoroutine(WaitForChanges());
             
         }
+        if (CheckForGameOver())
+        {
+            gameManager.GameOver();
+        }
+
+        // 💾 сохраняем после каждого хода
+        gameManager.SaveGame();
+
     }
     private bool MoveTile(Tile tile, Vector2Int direction)
     {
@@ -192,6 +251,8 @@ public class TileBoard : MonoBehaviour
         if (CheckForGameOver())
         {
             gameManager.GameOver();
+            gameManager.SaveGame();
+
         }
     }
     private bool CheckForGameOver()
