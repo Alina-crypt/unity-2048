@@ -12,6 +12,10 @@ public class TileBoard : MonoBehaviour
     private List<Tile> tiles;
     AudioManager audioManager;
     private bool waiting;
+    private Vector2 startTouch;
+    private Vector2 endTouch;
+    private float swipeThreshold = 50f;
+
     private void Awake()
     {
         grid = GetComponentInChildren<TileGrid>();
@@ -117,28 +121,111 @@ public class TileBoard : MonoBehaviour
     }
     private void Update()
     {
-        if (!waiting)
-        {
-            if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
-            {
-                MoveTiles(Vector2Int.up, 0, 1, 1, 1); // y от 1 до height
-            }
-            else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
-            {
-                MoveTiles(Vector2Int.down, 0, 1, grid.height - 2, -1); // y от height - 2 до 0
-            }
-            else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
-            {
-                MoveTiles(Vector2Int.left, 1, 1, 0, 1); // x от 1 до width
-            }
-            else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
-            {
-                MoveTiles(Vector2Int.right, grid.width - 2, -1, 0, 1); // x от width - 2 до 0
-            }
-        }
         if (waiting || riddleActive) return;
 
+        // ПК-клавиши
+        if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            HandleSwipe(Vector2Int.up);
+        }
+        else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            HandleSwipe(Vector2Int.down);
+        }
+        else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            HandleSwipe(Vector2Int.left);
+        }
+        else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            HandleSwipe(Vector2Int.right);
+        }
+
+        // Мобильные свайпы
+        if (Input.touchCount > 0)
+        {
+            Touch touch = Input.GetTouch(0);
+
+            switch (touch.phase)
+            {
+                case TouchPhase.Began:
+                    startTouch = touch.position;
+                    break;
+
+                case TouchPhase.Ended:
+                    endTouch = touch.position;
+                    Vector2 swipeDelta = endTouch - startTouch;
+
+                    if (swipeDelta.magnitude < swipeThreshold)
+                        return;
+
+                    Vector2 direction = swipeDelta.normalized;
+
+                    if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
+                    {
+                        if (direction.x > 0)
+                            HandleSwipe(Vector2Int.right);
+                        else
+                            HandleSwipe(Vector2Int.left);
+                    }
+                    else
+                    {
+                        if (direction.y > 0)
+                            HandleSwipe(Vector2Int.up);
+                        else
+                            HandleSwipe(Vector2Int.down);
+                    }
+                    break;
+            }
+        }
+#if UNITY_EDITOR
+        if (Input.GetMouseButtonDown(0))
+        {
+            startTouch = Input.mousePosition;
+        }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            endTouch = Input.mousePosition;
+            Vector2 swipeDelta = endTouch - startTouch;
+
+            if (swipeDelta.magnitude >= swipeThreshold)
+            {
+                Vector2 direction = swipeDelta.normalized;
+
+                if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
+                {
+                    if (direction.x > 0)
+                        HandleSwipe(Vector2Int.right);
+                    else
+                        HandleSwipe(Vector2Int.left);
+                }
+                else
+                {
+                    if (direction.y > 0)
+                        HandleSwipe(Vector2Int.up);
+                    else
+                        HandleSwipe(Vector2Int.down);
+                }
+            }
+        }
+#endif
+
     }
+
+    public void HandleSwipe(Vector2Int direction)
+    {
+        if (waiting || riddleActive) return;
+
+        if (direction == Vector2Int.up)
+            MoveTiles(Vector2Int.up, 0, 1, 1, 1);
+        else if (direction == Vector2Int.down)
+            MoveTiles(Vector2Int.down, 0, 1, grid.height - 2, -1);
+        else if (direction == Vector2Int.left)
+            MoveTiles(Vector2Int.left, 1, 1, 0, 1);
+        else if (direction == Vector2Int.right)
+            MoveTiles(Vector2Int.right, grid.width - 2, -1, 0, 1);
+    }
+
 
     private void MoveTiles(Vector2Int direction, int startX, int incrementX, int startY, int incrementY)
     {
@@ -165,7 +252,7 @@ public class TileBoard : MonoBehaviour
             gameManager.GameOver();
         }
 
-        // 💾 сохраняем после каждого хода
+       
         gameManager.SaveGame();
 
     }
